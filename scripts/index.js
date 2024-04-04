@@ -6,26 +6,31 @@ const card = document.querySelector(".places__list");
 
 // @todo: Функция создания карточки
 
-function CreateCard(element, DeleteButtonCall) {
+function createCard(element, deleteButtonCall) {
   const cardItem = cardContainer.querySelector(".places__item").cloneNode(true);
   cardItem.querySelector(".card__image").src = element.link;
   cardItem.querySelector(".card__title").textContent = element.name;
-  cardItem
-    .querySelector(".card__delete-button")
-    .addEventListener("click", () => {
-      DeleteButtonCall = DeleteCard();
-    });
-
+  const buttonDelete = cardItem.querySelector(".card__delete-button");
+  buttonDelete.addEventListener("click", () => {
+    deleteCard(cardItem);
+  });
   return cardItem;
+
+  // Можно мне пояснительную бригаду
+  // Сейчас все работает, но я не понимаю, где мы используем второй параметр deleteButtonCall ? или нужно написать вот так ↓ и почему работают оба способа
+  //    buttonDelete.addEventListener("click", () => {
+  //    deleteButtonCall=deleteCard(cardItem)
+  //  });
+  //
 }
 // @todo: Функция удаления карточки
 
-function DeleteCard() {
-  document.querySelector(".places__item").remove();
+function deleteCard(card) {
+  card.remove();
 }
 
 // @todo: Вывести карточки на страницу
 
 initialCards.forEach((item) => {
-  card.append(CreateCard(item));
+  card.append(createCard(item, deleteCard));
 });
