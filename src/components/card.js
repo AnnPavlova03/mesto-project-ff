@@ -1,27 +1,50 @@
-import { inputType, inputUrl, cardContainer, card, remove } from "../index";
-export { createNewCard, like, deleteCard };
+import { cardContainer, cardSection } from "../index";
 
-// Создание карточки
-function createNewCard(evt) {
-  evt.preventDefault();
+// @todo: Функция создания карточки
 
+function createCard(element, deleteButtonCall, cardLike, handleImageClick) {
   const cardItem = cardContainer.querySelector(".places__item").cloneNode(true);
-  const cardImages = cardItem.querySelector(".card__image");
+  const cardImage = cardItem.querySelector(".card__image");
   const cardTitle = cardItem.querySelector(".card__title");
   const buttonDelete = cardItem.querySelector(".card__delete-button");
 
-  cardImages.src = inputUrl.value;
-  cardTitle.textContent = inputType.value;
+  cardImage.src = element.link;
+  cardImage.alt = element.name;
+  cardTitle.textContent = element.name;
+
+  buttonDelete.addEventListener("click", () => {
+    deleteButtonCall(cardItem);
+  });
+  cardSection.addEventListener("click", cardLike);
+  cardImage.addEventListener("click", () => {
+    handleImageClick(cardImage, cardTitle);
+  });
+
+  return cardItem;
+}
+
+// Функция добавления новой карточки
+function createNewCard(url, text, { deleteCard, cardLike, handleImageClick }) {
+  const cardItem = cardContainer.querySelector(".places__item").cloneNode(true);
+  const cardImage = cardItem.querySelector(".card__image");
+  const cardTitle = cardItem.querySelector(".card__title");
+  const buttonDelete = cardItem.querySelector(".card__delete-button");
+
+  cardImage.src = url.value;
+  cardImage.alt = text.value;
+  cardTitle.textContent = text.value;
 
   buttonDelete.addEventListener("click", () => {
     deleteCard(cardItem);
   });
-  cardImages.addEventListener("click", () => {
-    openPopupImage(cardImages, cardTitle);
-  });
 
-  card.prepend(cardItem);
-  remove();
+  cardSection.prepend(cardItem);
+
+  cardImage.addEventListener("click", () => {
+    handleImageClick(cardImage, cardTitle);
+  });
+  cardSection.addEventListener("click", cardLike);
+  return cardItem;
 }
 
 //  функциz Like
@@ -35,3 +58,5 @@ function like(evt) {
 function deleteCard(card) {
   card.remove();
 }
+
+export { like, deleteCard, createCard, createNewCard };
