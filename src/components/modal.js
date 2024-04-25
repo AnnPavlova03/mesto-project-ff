@@ -10,8 +10,8 @@ function openPopup(popup) {
 
 function closePopup(popup) {
   popup.classList.remove("popup_is-opened");
-  popup.classList.remove("popup_is-animated");
   document.removeEventListener("keydown", handleEscape);
+  popup.removeEventListener("click", closeByOverlay);
 }
 
 function handleEscape(evt) {

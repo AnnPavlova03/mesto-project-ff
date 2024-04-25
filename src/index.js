@@ -4,20 +4,16 @@ import {
   like,
   deleteCard,
   createCard,
-  createNewCard,
+  cardSection,
 } from "./components/card.js";
 import { closePopup, openPopup } from "./components/modal.js";
-
-// @todo: Темплейт карточки
-const cardContainer = document.querySelector("#card-template").content;
-
-// @todo: DOM узлы
-const cardSection = document.querySelector(".places__list");
 
 // @todo: Вывести карточки на страницу
 
 initialCards.forEach((item) => {
-  cardSection.append(createCard(item, deleteCard, like, handleImageClick));
+  cardSection.append(
+    createCard(item.link, item.name, deleteCard, like, handleImageClick)
+  );
 });
 
 // DOM кнопки
@@ -31,16 +27,16 @@ const popupCard = document.querySelector(".popup_type_new-card");
 
 profileEditButton.addEventListener("click", () => {
   openPopup(popupName);
-  resetForm();
+  fillProfileInputs();
 });
 profileAddButton.addEventListener("click", () => {
   openPopup(popupCard);
 });
+
 closeButtons.forEach((button) => {
+  const popup = button.closest(".popup");
   button.addEventListener("click", () => {
-    closePopup(popupCard);
-    closePopup(popupName);
-    closePopup(popupTypeImage);
+    closePopup(popup);
   });
 });
 
@@ -54,12 +50,6 @@ function handleImageClick(image, text) {
   popupImage.alt = text.textContent;
   popupImage.src = image.src;
 }
-
-function resetForm() {
-  nameInput.value = profileName.textContent;
-  jobInput.value = profileDescription.textContent;
-}
-
 // попам профиля
 const profileForm = document.forms["edit-profile"];
 const nameInput = profileForm.elements["name"];
@@ -67,10 +57,10 @@ const jobInput = profileForm.elements["description"];
 const profileName = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
 
-// попам места
-const formElementNew = document.forms["new-place"];
-const inputType = formElementNew.elements["place-name"];
-const inputUrl = formElementNew.elements["link"];
+function fillProfileInputs() {
+  nameInput.value = profileName.textContent;
+  jobInput.value = profileDescription.textContent;
+}
 
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
@@ -79,15 +69,22 @@ function handleProfileFormSubmit(evt) {
   closePopup(popupName);
   profileForm.reset();
 }
-function chandlePlaceFormSubmit(evt) {
+// форма с профилем
+profileForm.addEventListener("submit", handleProfileFormSubmit);
+
+// попам места
+const formElementNew = document.forms["new-place"];
+const inputType = formElementNew.elements["place-name"];
+const inputUrl = formElementNew.elements["link"];
+
+function handlePlaceFormSubmit(evt) {
   evt.preventDefault();
-  createNewCard(inputUrl, inputType, { deleteCard, like, handleImageClick });
+  cardSection.prepend(
+    createCard(inputUrl, inputType, deleteCard, like, handleImageClick)
+  );
   formElementNew.reset();
   closePopup(popupCard);
 }
-// форма с профилем
-profileForm.addEventListener("submit", handleProfileFormSubmit);
-// форма с добавлением места
-formElementNew.addEventListener("submit", chandlePlaceFormSubmit);
 
-export { cardContainer, cardSection }; // в card
+// форма с добавлением места
+formElementNew.addEventListener("submit", handlePlaceFormSubmit);
