@@ -11,9 +11,7 @@ import { closePopup, openPopup } from "./components/modal.js";
 // @todo: Вывести карточки на страницу
 
 initialCards.forEach((item) => {
-  cardSection.append(
-    createCard(item.link, item.name, deleteCard, like, handleImageClick)
-  );
+  cardSection.append(createCard(item.link, item.name, deleteCard, like, handleImageClick));
 });
 
 // DOM кнопки
@@ -77,11 +75,10 @@ const formElementNew = document.forms["new-place"];
 const inputType = formElementNew.elements["place-name"];
 const inputUrl = formElementNew.elements["link"];
 
+
 function handlePlaceFormSubmit(evt) {
   evt.preventDefault();
-  cardSection.prepend(
-    createCard(inputUrl, inputType, deleteCard, like, handleImageClick)
-  );
+  cardSection.prepend(createCard( inputUrl.value, inputType.value, deleteCard, like, handleImageClick));
   formElementNew.reset();
   closePopup(popupCard);
 }
