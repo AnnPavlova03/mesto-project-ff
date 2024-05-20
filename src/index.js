@@ -153,7 +153,7 @@ function handleAvatarFormSubmit(evt) {
   renderLoading(true, buttonAvatar);
   changeAvatar(inputUrlAvatar.value)
     .then((data) => {
-      profileImage.style.backgroundImage = `url('${data.avatar}'}`;
+      profileImage.style.backgroundImage = `url('${data.avatar}')`;
       console.log(data);
     })
     .catch((err) => {
