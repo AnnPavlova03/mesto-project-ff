@@ -11,7 +11,6 @@ import {
   enableValidation,
   clearValidation,
   validationConfig,
-  buttonStateClear,
 } from "./components/validation.js";
 import { sentMyData, sentCardData, changeAvatar } from "./components/api.js";
 
@@ -31,10 +30,10 @@ profileEditButton.addEventListener("click", () => {
     popupName.querySelector(validationConfig.formSelector),
     validationConfig
   );
-  buttonStateClear(
-    popupName.querySelector(validationConfig.submitButtonSelector),
-    validationConfig
-  );
+  // buttonStateClear(
+  //   popupName.querySelector(validationConfig.submitButtonSelector),
+  //   validationConfig
+  // );
 });
 profileAddButton.addEventListener("click", () => {
   openPopup(popupCard);

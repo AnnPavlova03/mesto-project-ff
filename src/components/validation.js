@@ -82,14 +82,6 @@ function toggleButtonState(inputList, buttonElement, validationConfig) {
   }
 }
 
-function buttonStateClear(button, validationConfig) {
-  const submitButton = document.querySelector(
-    validationConfig.submitButtonSelector
-  );
-  submitButton.disabled = false;
-  submitButton.classList.remove(validationConfig.inactiveButtonClass);
-}
-
 // проверяет все инпуты на валидность
 function hasInvalidInput(inputList) {
   return inputList.some((inputElement) => {
@@ -110,12 +102,7 @@ function clearValidation(formElement, validationConfig) {
   const inputList = Array.from(
     formElement.querySelectorAll(validationConfig.inputSelector)
   );
-
+  formElement.reset();
   toggleButtonState(inputList, submitButton, validationConfig);
 }
-export {
-  clearValidation,
-  enableValidation,
-  validationConfig,
-  buttonStateClear ,
-};
+export { clearValidation, enableValidation, validationConfig };
