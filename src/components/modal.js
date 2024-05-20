@@ -6,15 +6,12 @@ function openPopup(popup) {
 
   document.addEventListener("keydown", handleEscape);
   popup.addEventListener("click", closeByOverlay);
-
-  
 }
 
 function closePopup(popup) {
   popup.classList.remove("popup_is-opened");
   document.removeEventListener("keydown", handleEscape);
   popup.removeEventListener("click", closeByOverlay);
-  
 }
 
 function handleEscape(evt) {

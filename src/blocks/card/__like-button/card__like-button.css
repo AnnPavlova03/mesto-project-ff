@@ -18,3 +18,8 @@
 .card__like-button:hover {
   opacity: 0.6;
 }
+
+.wrapper_button-like{
+  display: flex;
+  flex-direction: column;
+}

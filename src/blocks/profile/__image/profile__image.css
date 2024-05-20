@@ -7,6 +7,8 @@
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
+transition: filter 0.3s;
+position: relative;
 }
 
 @media screen and (max-width: 740px) {
@@ -20,3 +22,38 @@
     margin-right: 0;
   }
 }
+.wrapper:hover .profile__image{
+cursor: pointer;
+filter: brightness(0.2);
+
+} 
+
+
+.profile__image_correct{
+  position: absolute;  
+top:80px;
+left:45px;
+display: none;
+cursor: pointer;
+}
+.wrapper:hover .profile__image_correct {
+  display: block;
+}
+
+/* .profile__image:hover  {
+  cursor: pointer;
+  filter: brightness(0.2);
+}
+
+.profile__image::before {
+  content: url(/src/images/Vector.png);
+  position: absolute;
+  top: 80px;
+  left: 45px;
+
+  transition: opacity 0.3s;
+}
+
+.profile__image:hover::before {
+  opacity: 1;
+} */

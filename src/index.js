@@ -1,20 +1,19 @@
-import { initialCards } from "./scripts/cards.js";
 import "./pages/index.css";
 import {
-  like,
+  cardLike,
   deleteCard,
   createCard,
   cardSection,
+  handleImageClick,
 } from "./components/card.js";
 import { closePopup, openPopup } from "./components/modal.js";
-
-// @todo: Вывести карточки на страницу
-
-initialCards.forEach((item) => {
-  cardSection.append(
-    createCard(item.link, item.name, deleteCard, like, handleImageClick)
-  );
-});
+import {
+  enableValidation,
+  clearValidation,
+  validationConfig,
+  buttonStateClear,
+} from "./components/validation.js";
+import { sentMyData, sentCardData, changeAvatar } from "./components/api.js";
 
 // DOM кнопки
 const profileEditButton = document.querySelector(".profile__edit-button");
@@ -30,6 +29,10 @@ profileEditButton.addEventListener("click", () => {
   fillProfileInputs();
   clearValidation(
     popupName.querySelector(validationConfig.formSelector),
+    validationConfig
+  );
+  buttonStateClear(
+    popupName.querySelector(validationConfig.submitButtonSelector),
     validationConfig
   );
 });
@@ -48,27 +51,22 @@ closeButtons.forEach((button) => {
   });
 });
 
-const popupTypeImage = document.querySelector(".popup_type_image");
-const popupImage = document.querySelector(".popup__image");
-const popupCaption = document.querySelector(".popup__caption");
+//Валидация профиля
 
-function handleImageClick(image, text) {
-  openPopup(popupTypeImage);
-  popupCaption.textContent = text.textContent;
-  popupImage.alt = text.textContent;
-  popupImage.src = image.src;
-}
+enableValidation(validationConfig);
+
 // попам профиля
 const profileForm = document.forms["edit-profile"];
 const nameInput = profileForm.elements["name"];
 const jobInput = profileForm.elements["description"];
+const buttonName = profileForm.elements["button-name"];
 const profileName = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
+const profileImage = document.querySelector(".profile__image");
 
 function fillProfileInputs() {
   nameInput.value = profileName.textContent;
   jobInput.value = profileDescription.textContent;
-
 }
 
 function handleProfileFormSubmit(evt) {
@@ -76,136 +74,105 @@ function handleProfileFormSubmit(evt) {
   profileName.textContent = nameInput.value;
   profileDescription.textContent = jobInput.value;
   closePopup(popupName);
+  renderLoading(true, buttonName);
   profileForm.reset();
-  
-
-}
-// форма с профилем
-profileForm.addEventListener("submit", handleProfileFormSubmit);
-
-//Валидация профиля
-
-//Отображает сообщение об ошибке и добавляет класс ошибки к инпуту
-function showInputError(formElement, inputElement, errorMessage) {
-  const formError = formElement.querySelector(`.${inputElement.id}-error`);
-  inputElement.classList.add(validationConfig.inputErrorClass);
-  formError.textContent = errorMessage;
-  formError.classList.add(validationConfig.errorClass);
-}
-// удаляет класс ошибки
-function hideInputError(formElement, inputElement) {
-  const formError = formElement.querySelector(`.${inputElement.id}-error`);
-  inputElement.classList.remove(validationConfig.inputErrorClass);
-  formError.classList.remove(validationConfig.errorClass);
-  formError.textContent = "";
-}
-// Проверяем валидацию инпута в зависимости от значения отобрадаем или скрываем ошибки
-function checkInputValidity(formElement, inputElement) {
-  if (inputElement.validity.patternMismatch) {
-    inputElement.setCustomValidity(inputElement.dataset.errorMessage);
-  } else {
-    inputElement.setCustomValidity("");
-  }
-
-  if (!inputElement.validity.valid) {
-    showInputError(formElement, inputElement, inputElement.validationMessage);
-  } else {
-    hideInputError(formElement, inputElement);
-  }
-}
-
-// делает проверку формы "живой" за счет 'input' и работает с состоянием кнокпи сохранить
-function setEventListener(formElement) {
-  const inputList = Array.from(formElement.querySelectorAll(".popup__input"));
-  const buttonElement = document.querySelector(".popup__button");
-  toggleButtonState(inputList, buttonElement);
-  
-  inputList.forEach((inputElement) => {
-    inputElement.addEventListener("input", () => {
-      checkInputValidity(formElement, inputElement);
-      toggleButtonState(inputList, buttonElement);
-    
+  const input = {
+    name: profileName.textContent,
+    about: profileDescription.textContent,
+  };
+  sentMyData(input)
+    .then((data) => {
+      input.name = data.name;
+      input.about = data.about;
+    })
+    .catch((error) => {
+      console.error("Ошибка. Запрос не выполнен", error);
+    })
+    .finally(() => {
+      renderLoading(false, buttonName);
     });
-  });
 }
 
-// ищет все формы в DOM и проверяет инпуты на валидацию
-function enableValidation() {
-  const formList = Array.from(document.querySelectorAll(".popup__form"));
-  formList.forEach((formElement) => {
-    setEventListener(formElement);
-  });
-}
-enableValidation();
-
-const validationConfig = {
-  formSelector: ".popup__form",
-  inputSelector: ".popup__input",
-  submitButtonSelector: ".popup__button",
-  inactiveButtonClass: "form__submit_inactive",
-  inputErrorClass: "form__input_type_error",
-  errorClass: "form__input-error_active",
-};
-
-// проверяет все инпуты на валидность
-function hasInvalidInput(inputList) {
-  return inputList.some((inputElement) => {
-    return !inputElement.validity.valid;
-  });
-}
-
-// добавляет класс кнопке в случае если инпут невалиден
-function toggleButtonState(inputList, buttonElement) {
-  if (hasInvalidInput(inputList)) {
-    buttonElement.disabled = true;
-    buttonElement.classList.add('form__submit_inactive');
-  } else {
-    buttonElement.disabled = false;
-    buttonElement.classList.remove('form__submit_inactive');
-  }
-}
-
-function clearValidation(formElement, validationConfig) {
-  const inputErrorList = Array.from(
-    formElement.querySelectorAll(`.${validationConfig.inputErrorClass}`)
-  );
-  inputErrorList.forEach((inputElement) => {
-    hideInputError(formElement, inputElement);
-  });
-  const submitButton = formElement.querySelector(validationConfig.submitButtonSelector);
-  const inputList = Array.from(formElement.querySelectorAll(validationConfig.inputSelector));
-    toggleButtonState(inputList, submitButton);
- 
-}
-
-
-
-
-
-
-
-
-
+profileForm.addEventListener("submit", handleProfileFormSubmit);
 
 // попам места
 const formElementNew = document.forms["new-place"];
 const inputType = formElementNew.elements["place-name"];
 const inputUrl = formElementNew.elements["link"];
+const buttonPlace = formElementNew["button-place"];
 
 function handlePlaceFormSubmit(evt) {
   evt.preventDefault();
-  cardSection.prepend(
-    createCard(
-      inputUrl.value,
-      inputType.value,
-      deleteCard,
-      like,
-      handleImageClick
-    )
-  );
+  const inputValue = {
+    name: inputType.value,
+    link: inputUrl.value,
+  };
+  renderLoading(true, buttonPlace);
+  sentCardData(inputValue)
+    .then((dataAnswer) => {
+      cardSection.prepend(
+        createCard(
+          dataAnswer,
+          deleteCard,
+          cardLike,
+          handleImageClick,
+          dataAnswer.owner._id
+        )
+      );
+    })
+    .catch((err) => {
+      console.log("Ошибка. Запрос не выполнен: ", err);
+    })
+    .finally(() => {
+      renderLoading(false, buttonPlace);
+    });
+
   formElementNew.reset();
   closePopup(popupCard);
 }
 
 // форма с добавлением места
 formElementNew.addEventListener("submit", handlePlaceFormSubmit);
+
+const profileAvatarCorrect = document.querySelector(".profile__image_correct");
+const popupChangeAvatar = document.querySelector(".popup_type_avatar");
+const formEditAvatar = document.forms["edit-avatar"];
+const inputUrlAvatar = formEditAvatar.elements["url"];
+const buttonAvatar = formEditAvatar.elements["button-avatar"];
+
+profileAvatarCorrect.addEventListener("click", () => {
+  openPopup(popupChangeAvatar);
+  clearValidation(
+    popupChangeAvatar.querySelector(validationConfig.formSelector),
+    validationConfig
+  );
+});
+
+function handleAvatarFormSubmit(evt) {
+  evt.preventDefault();
+  renderLoading(true, buttonAvatar);
+  changeAvatar(inputUrlAvatar.value)
+    .then((data) => {
+      profileImage.style.backgroundImage = `url('${data.avatar}'}`;
+      console.log(data);
+    })
+    .catch((err) => {
+      console.log("Ошибка. Запрос не выполнен: ", err);
+    })
+    .finally(() => {
+      renderLoading(false, buttonAvatar);
+    });
+
+  formEditAvatar.reset();
+  closePopup(popupChangeAvatar);
+}
+
+formEditAvatar.addEventListener("submit", handleAvatarFormSubmit);
+
+function renderLoading(isLoading, button) {
+  if (isLoading) {
+    button.textContent = "Сохранение...";
+  } else {
+    button.textContent = "Сохранить";
+  }
+}
