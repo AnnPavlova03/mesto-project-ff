@@ -7,8 +7,8 @@
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
-transition: filter 0.3s;
-position: relative;
+  transition: filter 0.3s;
+  position: relative;
 }
 
 @media screen and (max-width: 740px) {
@@ -21,39 +21,23 @@ position: relative;
   .profile__image {
     margin-right: 0;
   }
+  #correct {
+    left: 175px;
+    top: 90px;
+  }
 }
-.wrapper:hover .profile__image{
-cursor: pointer;
-filter: brightness(0.2);
-
-} 
-
-
-.profile__image_correct{
-  position: absolute;  
-top:80px;
-left:45px;
-display: none;
-cursor: pointer;
-}
-.wrapper:hover .profile__image_correct {
-  display: block;
-}
-
-/* .profile__image:hover  {
+.wrapper:hover .profile__image {
   cursor: pointer;
   filter: brightness(0.2);
 }
 
-.profile__image::before {
-  content: url(/src/images/Vector.png);
+.profile__image_correct {
   position: absolute;
-  top: 80px;
+  top: 85px;
   left: 45px;
-
-  transition: opacity 0.3s;
+  display: none;
+  cursor: pointer;
 }
-
-.profile__image:hover::before {
-  opacity: 1;
-} */
+.wrapper:hover .profile__image_correct {
+  display: block;
+}

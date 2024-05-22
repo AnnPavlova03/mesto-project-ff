@@ -4,16 +4,16 @@ import {
   deleteCard,
   createCard,
   cardSection,
-  handleImageClick,
 } from "./components/card.js";
 import { closePopup, openPopup } from "./components/modal.js";
+import { enableValidation, clearValidation } from "./components/validation.js";
 import {
-  enableValidation,
-  clearValidation,
-  validationConfig,
-  buttonStateClear,
-} from "./components/validation.js";
-import { sentMyData, sentCardData, changeAvatar } from "./components/api.js";
+  sentMyData,
+  sentCardData,
+  changeAvatar,
+  getDataUserAndCards,
+} from "./components/api.js";
+import { validationConfig } from "./components/validation.js";
 
 // DOM кнопки
 const profileEditButton = document.querySelector(".profile__edit-button");
@@ -29,10 +29,6 @@ profileEditButton.addEventListener("click", () => {
   fillProfileInputs();
   clearValidation(
     popupName.querySelector(validationConfig.formSelector),
-    validationConfig
-  );
-  buttonStateClear(
-    popupName.querySelector(validationConfig.submitButtonSelector),
     validationConfig
   );
 });
@@ -64,6 +60,20 @@ const profileName = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
 const profileImage = document.querySelector(".profile__image");
 
+const dislayUserDataAndCards = () => {
+  getDataUserAndCards().then(([user, cards]) => {
+    profileName.textContent = user.name;
+    profileDescription.textContent = user.about;
+    profileImage.style.backgroundImage = `url('${user.avatar}')`;
+    cards.forEach((card) => {
+      cardSection.append(
+        createCard(card, deleteCard, cardLike, handleImageClick, user._id)
+      );
+    });
+  });
+};
+dislayUserDataAndCards();
+
 function fillProfileInputs() {
   nameInput.value = profileName.textContent;
   jobInput.value = profileDescription.textContent;
@@ -71,19 +81,17 @@ function fillProfileInputs() {
 
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
-  profileName.textContent = nameInput.value;
-  profileDescription.textContent = jobInput.value;
   closePopup(popupName);
   renderLoading(true, buttonName);
-  profileForm.reset();
+
   const input = {
-    name: profileName.textContent,
-    about: profileDescription.textContent,
+    name: nameInput.value,
+    about: jobInput.value,
   };
   sentMyData(input)
     .then((data) => {
-      input.name = data.name;
-      input.about = data.about;
+      profileName.textContent = data.name;
+      profileDescription.textContent = data.about;
     })
     .catch((error) => {
       console.error("Ошибка. Запрос не выполнен", error);
@@ -170,9 +178,16 @@ function handleAvatarFormSubmit(evt) {
 formEditAvatar.addEventListener("submit", handleAvatarFormSubmit);
 
 function renderLoading(isLoading, button) {
-  if (isLoading) {
-    button.textContent = "Сохранение...";
-  } else {
-    button.textContent = "Сохранить";
-  }
+  button.textContent = isLoading ? "Сохранение..." : "Сохранить";
+}
+
+const popupTypeImage = document.querySelector(".popup_type_image");
+const popupImage = document.querySelector(".popup__image");
+const popupCaption = document.querySelector(".popup__caption");
+
+function handleImageClick(image, text) {
+  openPopup(popupTypeImage);
+  popupCaption.textContent = text.textContent;
+  popupImage.alt = text.textContent;
+  popupImage.src = image.src;
 }

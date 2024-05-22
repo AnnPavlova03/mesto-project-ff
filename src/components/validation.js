@@ -1,18 +1,6 @@
-const validationConfig = {
-  formSelector: ".popup__form",
-  inputSelector: ".popup__input",
-  submitButtonSelector: ".popup__button",
-  inactiveButtonClass: "form__submit_inactive",
-  inputErrorClass: "form__input_type_error",
-  errorClass: "form__input-error_active",
-};
+import { validationConfig } from "./config";
 
-function showInputError(
-  formElement,
-  inputElement,
-  errorMessage,
-  validationConfig
-) {
+function showInputError(formElement, inputElement, errorMessage) {
   const formError = formElement.querySelector(`.${inputElement.id}-error`);
   inputElement.classList.add(validationConfig.inputErrorClass);
   formError.textContent = errorMessage;
@@ -74,20 +62,11 @@ function enableValidation(validationConfig) {
 
 function toggleButtonState(inputList, buttonElement, validationConfig) {
   if (hasInvalidInput(inputList)) {
-    buttonElement.disabled = true;
-    buttonElement.classList.add(validationConfig.inactiveButtonClass);
+    disableSubmitButton(buttonElement, validationConfig);
   } else {
     buttonElement.disabled = false;
     buttonElement.classList.remove(validationConfig.inactiveButtonClass);
   }
-}
-
-function buttonStateClear(button, validationConfig) {
-  const submitButton = document.querySelector(
-    validationConfig.submitButtonSelector
-  );
-  submitButton.disabled = false;
-  submitButton.classList.remove(validationConfig.inactiveButtonClass);
 }
 
 // проверяет все инпуты на валидность
@@ -110,12 +89,13 @@ function clearValidation(formElement, validationConfig) {
   const inputList = Array.from(
     formElement.querySelectorAll(validationConfig.inputSelector)
   );
-
+  disableSubmitButton(submitButton, validationConfig); // не поняла зачем это здесь, кнопка же и так в состоянии disable приходит после проверки toggleButtonState
   toggleButtonState(inputList, submitButton, validationConfig);
 }
-export {
-  clearValidation,
-  enableValidation,
-  validationConfig,
-  buttonStateClear ,
+
+const disableSubmitButton = (button, config) => {
+  button.disabled = true;
+  button.classList.add(config.inactiveButtonClass);
 };
+
+export { clearValidation, enableValidation, validationConfig };
